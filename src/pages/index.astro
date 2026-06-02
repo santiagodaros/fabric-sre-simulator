@@ -76,7 +76,11 @@
     .badge-region.region-fail { background: rgba(255,74,74,.09); border-color: rgba(255,74,74,.38); color: var(--red); }
 
     /* ── App shell ── */
-    .app { display: flex; flex-direction: column; height: 100vh; position: relative; }
+    .app {
+      display: flex; flex-direction: column;
+      height: 100vh; position: relative;
+      transform-origin: top left;
+    }
 
     /* ── Topbar ── */
     .topbar {
@@ -1464,9 +1468,37 @@ function ts() {
   return new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
+// ════════════════════════════════════════
+// VIEWPORT FIT — scales the app like a presentation
+// Keeps all proportions intact on any screen size
+// ════════════════════════════════════════
+const DESIGN_W = 1440, DESIGN_H = 900;
+
+function fitToViewport() {
+  const s = Math.min(
+    window.innerWidth  / DESIGN_W,
+    window.innerHeight / DESIGN_H,
+    1   // never scale UP — looks fine on larger screens as-is
+  );
+  const app = document.getElementById('app');
+  if (!app) return;
+  if (s < 0.999) {
+    app.style.transform       = `scale(${s})`;
+    app.style.width           = `${(100 / s).toFixed(4)}vw`;
+    app.style.height          = `${(100 / s).toFixed(4)}vh`;
+  } else {
+    // Full size — clear any previous scaling
+    app.style.transform = '';
+    app.style.width     = '';
+    app.style.height    = '';
+  }
+  // Recalculate chart after scale change
+  resizeChart();
+}
+
 // ── Start ambient + resize handler ──
-window.addEventListener('resize', resizeChart);
-setTimeout(() => { resizeChart(); setInterval(tickAmbient, 1000); }, 100);
+window.addEventListener('resize', () => { fitToViewport(); resizeChart(); });
+setTimeout(() => { fitToViewport(); resizeChart(); setInterval(tickAmbient, 1000); }, 100);
 
 // ════════════════════════════════════════
 // THEME SWITCHER
