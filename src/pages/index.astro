@@ -697,7 +697,7 @@
     <div class="topbar-right">
       <span class="topbar-meta">Fabric Day 2026 &nbsp;|&nbsp; <span style="color:var(--lime)">LIVE</span></span>
       <button class="topbar-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle Light/Dark mode">
-        <i class="fa-solid fa-moon" id="theme-icon"></i>
+        <i class="fa-solid fa-circle-half-stroke" id="theme-icon"></i>
       </button>
       <button class="topbar-btn gift-topbar-btn" onclick="toggleGift()">
         <i class="fa-solid fa-gift"></i> SRE Checklist &amp; Gift
@@ -1527,7 +1527,7 @@ function toggleTheme() {
   darkMode = !darkMode;
   document.body.classList.toggle('light-mode', !darkMode);
   const icon = document.getElementById('theme-icon');
-  if (icon) icon.className = darkMode ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+  if (icon) icon.className = 'fa-solid fa-circle-half-stroke';
   // Re-render chart to pick up dark background
   setTimeout(renderChart, 50);
 }
