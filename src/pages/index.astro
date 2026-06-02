@@ -570,16 +570,35 @@
 
     /* ── Consoles ALWAYS dark — untouchable ── */
     body.light-mode .mini-console,
+    /* ── Consoles & chart — navy profundo, no negro puro (armoniza con light mode) ── */
+    body.light-mode .mini-console,
     body.light-mode .big-console,
-    body.light-mode #bcdr-console { background: #050b14 !important; border-color: #1a2744 !important; }
-    body.light-mode .chart-wrapper { background: #050b14 !important; border-color: #1a2744 !important; }
+    body.light-mode #bcdr-console {
+      background: #0f1e2e !important;
+      border-color: #1e3a52 !important;
+      box-shadow: 0 2px 10px rgba(0,0,0,.14);
+    }
+    body.light-mode .chart-wrapper {
+      background: #0f1e2e !important;
+      border-color: #1e3a52 !important;
+      box-shadow: 0 2px 10px rgba(0,0,0,.14);
+    }
 
-    /* Code IDE always dark */
-    body.light-mode .code-pane     { background: #050b14 !important; }
-    body.light-mode .code-titlebar { background: rgba(3,8,18,.98) !important; border-color: #1a2744 !important; }
-    body.light-mode .line-numbers  { background: #020810 !important; border-color: #1a2744 !important; color: #2a3a4a !important; }
-    body.light-mode .code-content  { background: #050b14 !important; }
-    body.light-mode .json-block    { background: #050b14 !important; border-color: #1a2744 !important; }
+    /* Code IDE — navy oscuro, título con borde sutil */
+    body.light-mode .code-pane     { background: #0f1e2e !important; }
+    body.light-mode .code-titlebar {
+      background: #091624 !important;
+      border-color: #1e3a52 !important;
+      box-shadow: 0 1px 0 #1e3a52;
+    }
+    body.light-mode .code-titlebar .code-filename { color: #64748b !important; }
+    body.light-mode .line-numbers  {
+      background: #091624 !important;
+      border-color: #1e3a52 !important;
+      color: #2a4060 !important;
+    }
+    body.light-mode .code-content  { background: #0f1e2e !important; }
+    body.light-mode .json-block    { background: #0f1e2e !important; border-color: #1e3a52 !important; }
 
     /* Modal */
     body.light-mode .modal-box    { background: rgba(248,250,252,.99); border-color: #e2e8f0; box-shadow: 0 28px 70px rgba(0,0,0,.12); }
@@ -1305,7 +1324,7 @@ function renderChart() {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const PAD = 30;
 
-  ctx.fillStyle = '#000c1a';
+  ctx.fillStyle = document.body.classList.contains('light-mode') ? '#0f1e2e' : '#000c1a';
   ctx.fillRect(0, 0, W, H);
 
   // Grid
