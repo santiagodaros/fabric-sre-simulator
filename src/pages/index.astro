@@ -1276,7 +1276,7 @@ function togglePresenter() {
 function toggleStep(el) {
   el.classList.toggle('done');
   const check = el.querySelector('.pp-check i');
-  check.style.display = el.classList.contains('done') ? '' : 'none';
+  check.style.display = el.classList.contains('done') ? 'block' : 'none';
 }
 
 // ════════════════════════════════════════
@@ -1610,18 +1610,64 @@ const CL_ITEMS = [
 function renderChecklist() {
   const grid = document.getElementById('cl-grid');
   if (!grid || grid.children.length > 0) return;
+
   CL_ITEMS.forEach(label => {
-    const div = document.createElement('div');
-    div.className = 'cl-item';
-    div.innerHTML = `<div class="cl-check"><i class="fa-solid fa-check"></i></div><span class="cl-label">${label}</span>`;
-    div.addEventListener('click', () => { div.classList.toggle('done'); updateClProgress(); });
-    grid.appendChild(div);
+    const row = document.createElement('div');
+    // All styles inline — Astro CSS scoping doesn't apply to dynamic elements
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:7px;cursor:pointer;user-select:none;border:1px solid transparent;font-size:11px;transition:background .15s,border-color .15s;';
+
+    const box = document.createElement('div');
+    box.style.cssText = 'width:17px;height:17px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;border:1.5px solid rgba(255,255,255,.22);';
+
+    const tick = document.createElement('i');
+    tick.className = 'fa-solid fa-check';
+    tick.style.cssText = 'display:none;font-size:9px;font-weight:900;';
+    box.appendChild(tick);
+
+    const lbl = document.createElement('span');
+    lbl.textContent = label;
+    lbl.style.cssText = 'flex:1;transition:color .2s;';
+
+    row.appendChild(box); row.appendChild(lbl);
+
+    const applyState = (done) => {
+      const light = document.body.classList.contains('light-mode');
+      row._done = done;
+      if (done) {
+        const limeColor = light ? '#65a30d' : '#dcfd8b';
+        box.style.background   = limeColor;
+        box.style.borderColor  = limeColor;
+        tick.style.display     = 'block';
+        tick.style.color       = light ? '#fff' : '#0f172a';
+        lbl.style.color        = '#64748b';
+        lbl.style.textDecoration = 'line-through';
+        row.style.background   = light ? 'rgba(101,163,13,.07)' : 'rgba(220,253,139,.07)';
+        row.style.borderColor  = light ? 'rgba(101,163,13,.25)' : 'rgba(220,253,139,.25)';
+      } else {
+        box.style.background   = '';
+        box.style.borderColor  = light ? '#cbd5e1' : 'rgba(255,255,255,.22)';
+        tick.style.display     = 'none';
+        lbl.style.color        = '';
+        lbl.style.textDecoration = '';
+        row.style.background   = row.matches(':hover') ? 'rgba(255,255,255,.04)' : '';
+        row.style.borderColor  = 'transparent';
+      }
+      updateClProgress();
+    };
+
+    row.addEventListener('click',      () => applyState(!row._done));
+    row.addEventListener('mouseenter', () => { if (!row._done) row.style.background = 'rgba(255,255,255,.04)'; });
+    row.addEventListener('mouseleave', () => { if (!row._done) row.style.background = ''; });
+    row._done = false;
+
+    grid.appendChild(row);
   });
   updateClProgress();
 }
 
 function updateClProgress() {
-  const done  = document.querySelectorAll('#cl-grid .cl-item.done').length;
+  const rows  = Array.from(document.querySelectorAll('#cl-grid > div'));
+  const done  = rows.filter(r => r._done).length;
   const total = CL_ITEMS.length;
   const el    = document.getElementById('cl-progress');
   if (!el) return;
