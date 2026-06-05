@@ -1092,9 +1092,9 @@
   <span class="j-key">"resource_type"</span>: <span class="j-str">"Microsoft.Fabric/capacities"</span>,
   <span class="j-key">"metric"</span>: <span class="j-str">"CUConsumptionRate"</span>,
   <span class="j-key">"thresholds"</span>: &#123;
-    <span class="j-key">"warning_pct"</span>:  <span class="j-num">70</span>,
-    <span class="j-key">"critical_pct"</span>: <span class="j-num">80</span>,
-    <span class="j-key">"reject_pct"</span>:   <span class="j-num">95</span>
+    <span class="j-key">"warning_pct"</span>:  <span class="j-num" id="aj-warn" style="color:var(--red)">???</span>,
+    <span class="j-key">"critical_pct"</span>: <span class="j-num" id="aj-crit" style="color:var(--red)">???</span>,
+    <span class="j-key">"reject_pct"</span>:   <span class="j-num" id="aj-rej"  style="color:var(--red)">???</span>
   &#125;,
   <span class="j-key">"evaluation_window_min"</span>: <span class="j-num">5</span>,
   <span class="j-key">"action_group"</span>: <span class="j-str">"SRE-OnCall-Notifications"</span>,
@@ -1590,6 +1590,12 @@ function updateImpactPanel() {
 // ════════════════════════════════════════
 // SRE GIFT MODAL
 // ════════════════════════════════════════
+const ALERT_MAP = {
+  1: { id: 'aj-warn', fill: '70' },
+  2: { id: 'aj-crit', fill: '80' },
+  3: { id: 'aj-rej',  fill: '95' },
+};
+
 const CL_ITEMS = [
   'Activar monitoreo en la Capacity Metrics App de Fabric',
   'Definir alerta para umbral de Latencia (CU > 70%)',
@@ -1611,7 +1617,7 @@ function renderChecklist() {
   const grid = document.getElementById('cl-grid');
   if (!grid || grid.children.length > 0) return;
 
-  CL_ITEMS.forEach(label => {
+  CL_ITEMS.forEach((label, idx) => {
     const row = document.createElement('div');
     // All styles inline — Astro CSS scoping doesn't apply to dynamic elements
     row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:7px;cursor:pointer;user-select:none;border:1px solid transparent;font-size:11px;transition:background .15s,border-color .15s;';
@@ -1653,6 +1659,21 @@ function renderChecklist() {
         row.style.borderColor  = 'transparent';
       }
       updateClProgress();
+      const alertEntry = ALERT_MAP[idx];
+      if (alertEntry) {
+        const ajEl = document.getElementById(alertEntry.id);
+        if (ajEl) {
+          if (done) {
+            ajEl.textContent = alertEntry.fill;
+            ajEl.style.color = 'var(--lime)';
+            ajEl.classList.add('env-flash');
+            setTimeout(() => ajEl.classList.remove('env-flash'), 600);
+          } else {
+            ajEl.textContent = '???';
+            ajEl.style.color = 'var(--red)';
+          }
+        }
+      }
     };
 
     row.addEventListener('click',      () => applyState(!row._done));
